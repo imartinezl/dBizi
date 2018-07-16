@@ -20,7 +20,8 @@ matplotlib.rcParams['timezone'] = 'Europe/Madrid'
 #%% CONNECTION WITH RASPBERRY DB
 
 conn_string = "host='localhost' dbname='dBici' user='postgres' password='root'"
-conn_string = "host='192.168.1.205' dbname='dBici' user='postgres' password='root'"
+from key import conn_string
+
 
 def get_data(conn_string):
     conn = psycopg2.connect(conn_string)

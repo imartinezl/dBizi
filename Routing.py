@@ -65,7 +65,7 @@ routes.to_csv('routes.csv', index=False)
 stations_features = pd.read_csv('stations_location.csv')
 
 import requests
-key_gh = 'a61d7bca-ca1f-4c32-bf38-e5855d64a884'
+from key import key_gh
 urltemplate = 'https://graphhopper.com/api/1/route?point={latA},{lonA}&point={latB},{lonB}&vehicle={vehicle}&locale={locale}&key={key}&type=json&points_encoded={points}'
 
 routes = []
