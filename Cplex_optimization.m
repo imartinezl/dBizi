@@ -5,6 +5,7 @@ close all
 addpath('C:\Program Files\IBM\ILOG\CPLEX_Studio125\cplex\matlab\x64_win64');
 addpath('C:\Program Files\IBM\ILOG\CPLEX_Studio125\cplex\examples\src\matlab');
 
+%load('test.mat')
 A = importdata('A.csv');
 b = importdata('b.csv');
 c = importdata('c.csv');
@@ -31,6 +32,8 @@ cplex.Model.A     = A;
 cplex.Model.lhs   = lhs;
 cplex.Model.rhs   = rhs;
 
+% cplex.solve();
+
 % Optimize the problem
 cplex.feasOpt(lhs, rhs, lb, ub);
 slacks = cplex.Model.rhs - cplex.Solution.ax;
@@ -46,7 +49,7 @@ fprintf ('\nSolution status = %s\n',cplex.Solution.statusstring);
 fprintf ('Solution value = %f\n',cplex.Solution.objval);
 disp ('Values = ');
 % disp (cplex.Solution.x');
-plot(cplex.Solution.x)
+plot(cplex.Solution.x,'*');
 
 csvwrite('x.csv',cplex.Solution.x);
 csvwrite('ax.csv',cplex.Solution.ax);

@@ -12,14 +12,87 @@ import pandas as pd
 import numpy as np
 aparcabicis = geojson.load(open("C:/Users/Inigo/Desktop/dBici/20069_aparcabicis.geojson"))
 bidegorri = geojson.load(open("C:/Users/Inigo/Desktop/dBici/20069_bidegorri.geojson"))
-estaciones = pd.read_csv("C:/Users/Inigo/Desktop/dBici/stations_location.csv")
+stations_features = pd.read_csv("C:/Users/Inigo/Desktop/dBici/stations_location.csv")
 
 #%%
 
-#from folium import plugins
-#import sys
-#egg_path='C:/Program Files/Python36/Lib/site-packages/folium-0+unknown-py3.6.egg'
-#sys.path.append(egg_path)
+from math import sin, cos, sqrt, atan2, radians
+
+def mercator_distance(latA,lonA,latB,lonB):
+    R = 6373.0 * 1000   # approximate radius of earth in m
+    lat1, lon1 = radians(latA), radians(lonA)
+    lat2, lon2 = radians(latB), radians(lonB)
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1 
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a)) 
+    distance = R * c
+    return distance #in m
+def mercator_dist(a,b):
+    return mercator_distance(a[0],a[1],b[0],b[1])
+
+    
+#%%
+
+solution = pd.read_csv('solution.csv')
+solution['k'][np.isnan(solution['k'])]=1
+routes = pd.read_csv('routes.csv')
+
+features = []; cont = 0;
+for i in range(solution.shape[0]):
+    print(i)
+    origin = int(solution['origin'].iloc[i])
+    destination = int(solution['destination'].iloc[i])
+    ori_ts = solution['ori_ts'].iloc[i]
+    des_ts = solution['des_ts'].iloc[i]
+    t_initial = ori_ts
+    
+    route = routes[(routes['origin'] == origin) & (routes['destination'] == destination)].iloc[0]
+    route_coordinates = json.loads(route['route'])
+#    route_times = np.round(np.linspace(ori_ts*1000, des_ts*1000,len(route_coordinates))).tolist()
+
+    total_d = sum(mercator_dist(route_coordinates[k],route_coordinates[k+1]) for k in range(len(route_coordinates)-1))
+    speed_ratio = total_d/abs(des_ts-ori_ts)
+    
+    d_basic = 35
+    route_coordinates_new, route_times_new = [],[]
+    for k in range(len(route_coordinates)-1):
+        d_ = mercator_dist(route_coordinates[k],route_coordinates[k+1])
+        npoints = int(np.floor(d_/d_basic))
+    
+        lons = np.round(np.linspace(route_coordinates[k][0],route_coordinates[k+1][0],2+npoints),6)
+        lats = np.round(np.linspace(route_coordinates[k][1],route_coordinates[k+1][1],2+npoints),6)
+        
+        [route_coordinates_new.append([lons[m],lats[m]]) for m in range(2+npoints)  if [lons[m],lats[m]] not in route_coordinates_new]
+        
+        t_final = np.round(t_initial + (d_/speed_ratio))
+        route_times = np.round(np.linspace(t_initial*1000, t_final*1000, 2+npoints)).tolist()
+        [route_times_new.append(m) for m in route_times if m not in route_times_new]
+        t_initial = t_final
+    for _ in range(int(solution['k'].iloc[i])):
+        features.append({
+                        'type': 'Feature',
+                        'geometry': {
+                                'type': 'LineString',
+                                'coordinates': route_coordinates_new,
+                                },
+                        'properties': {
+                                'style':{'color':'#100000', 'weight':1, 'opacity':0},
+                                'times': (np.array(route_times_new) + 60*_).tolist()
+                                }
+                    })
+    if len(features)>100:
+        json.dump(features,open('features_'+str(cont)+'.json', 'w'))
+        cont = cont + 1
+        features = []
+
+json.dump(features,open('features_'+str(cont)+'.json', 'w'))
+
+#%%
+
+v_lat = np.linspace(43.292,43.330,40)
+v_lon = np.linspace(-2.021,-1.947,40)
+
 #%%
 from folium import plugins
 import folium
@@ -31,13 +104,13 @@ m = folium.Map(
 
 folium.plugins.TimestampedGeoJson(data={
     'type': 'FeatureCollection',
-    'features': features
-    }, loop=True, add_last_point=True, period='PT5S', duration='PT30S'
+    'features': features[0:2]
+    }, loop=True, add_last_point=True, period='PT5S', duration='PT5M'
 ).add_to(m)
 
 #ESTACIONES
-for i in range(estaciones.shape[0]):
-    point = estaciones.iloc[i]
+for i in range(stations_features.shape[0]):
+    point = stations_features.iloc[i]
     folium.CircleMarker(
             location=[point['latitud'], point['longitud']], 
             popup=point['nombre'],
@@ -48,7 +121,7 @@ for i in range(estaciones.shape[0]):
     
 #APARCABICIS
 #for i in range(len(aparcabicis['features'])):
-for i in range(20):
+for i in range(0):
     point = aparcabicis['features'][i]['geometry']['coordinates']
     folium.CircleMarker(
             location=[point[1], point[0]], 
@@ -75,15 +148,10 @@ def style_function(feature):
         'weight': 1,
     }
 
-folium.GeoJson(
-    bidegorri,
-    name='bidegorri',
-    style_function= style_function
-).add_to(m)
-
-
-
-    
-
+#folium.GeoJson(
+#    'bidegorri.json',
+#    name='bidegorri',
+#    style_function= style_function
+#).add_to(m)
 
 m.save('index.html')

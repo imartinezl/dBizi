@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>dBizi++</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		
+	    <script src="assets/js/leaflet.js"></script>
+		<script src="assets/js/iso8601.min.js"></script>
+		<script src="assets/js/leaflet.timedimension.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script src="assets/js/bootstrap.min.js"></script>
+		
+		<link rel="stylesheet" href="assets/css/style.css"/>
+		<link rel="stylesheet" href="assets/css/leaflet.css"/>
+		<link rel="stylesheet" href="assets/css/leaflet.timedimension.control.min.css"/>
+		<link rel="stylesheet" href="http://apps.socib.es/Leaflet.TimeDimension/dist/leaflet.timedimension.control.min.css"/>
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+							<li><a href="#dBizi">dBizi++</a></li>
+							<li><a href="#concept">Concepto</a></li>
+							<li><a href="#map_">Mapa Viajes</a></li>
+							<li><a href="#design">Diseño</a></li>
+							<!--<li><a href="#study">Estudio Piloto</a></li>-->
+							<!--<li><a href="#technology">Tecnologias</a></li>-->
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Intro -->
+					<section id="dBizi" class="wrapper style1 fullscreen fade-up">
+						<div class="inner" style="padding-top: 2em;">
+							<a href="#design" class="image">
+							<img src="images/logo_blue_with_iphone.png" width="70%" alt="" data-position="25% 25%"/>
+							</a>
+							<!--<a href="#" class="image"><img src="images/logo_blue.png" height="150" alt="" data-position="25% 25%" /></a>-->
+
+							<p>App para la consulta y planificación de viajes en bicicleta con <a href="https://www.dbizi.com/">dBizi</a><br/>
+							Disfuta de tu bici eléctrica siempre disponible en tu estación habitual</p>
+							<ul class="actions">
+								<!--<li><a target="_blank" href="https://app.atomic.io/d/OdTmtJBQcITv" class="button scrolly">Descubre nuestra app!</a></li>-->
+								<li><a href="#concept" class="button scrolly">Descubre nuestra app!</a></li>
+							</ul>
+						</div>
+					</section>
+				
+
+				<!-- Two -->
+				
+					<section id="concept" class="wrapper style3 fade-up">
+						<div class="inner">
+							<h2>Concepto</h2>
+							<p style="text-align: justify;text-justify: inter-word;">
+							dBizi++ se presenta como una aplicación para la consulta y planificación de viajes en bicicleta con dBizi. Este servicio emplea datos de bicicletas disponibles con el objetivo de garantizar la disponibilidad del servicio en todo momento, y para todos los usuarios. La aplicación informa al usuario de la viabilidad de su trayecto, empleando datos históricos y en tiempo real.
+							</p>
+							<div class="features">
+								<section>
+									<h3 style="text-align: center">Aplicación Sencilla</h3>
+									<img src="images/iphone_2.png" style="width:95%" class="center">
+									<p  style="text-align: center;;padding-top: 10px;">
+									</br>Revisa tus viajes con dBizi, comprueba el mapa de estaciones y reserva tu bici.
+									</p>
+								</section>
+								<section>
+									<h3 style="text-align: center;">Viajes con dBizi</h3>
+									<img src="images/iphone_4.png" style="width:95%" class="center">
+									<p style="text-align: center;">
+									</br>Más detalles sobre tus viajes: coste, distancia, e incluso los kg de CO2 equivalentes al mismo trayecto en automóvil.
+									</p>
+								</section>
+								<section>
+									<h3 style="text-align: center;">Reserva tu bici</h3>
+									<img src="images/iphone_5.png" style="width:95%" class="center">
+									<p style="text-align: center;">
+									</br>Reserva, bajo coste, un trayecto concreto: estación origen, estación destino, y hora estimada.
+									</p>
+								</section>
+								<section>
+									<h3 style="text-align: center;">Consulta las estaciones</h3>
+									<img src="images/iphone_11.png" style="width:95%" class="center">
+									<p style="text-align: center;">
+									</br>Visualiza los trayectos realizados en bicicleta por la ciudad, y conoce los carriles bici más empleados	
+									</p>
+								</section>
+							</div>
+						</div>
+					</section>
+					
+					<section id="map_" class="wrapper style1 fade-up">
+						<div class="inner">
+							<h2>Mapa de Viajes</h2></br>
+							<p>Este mapa muestra una estimación de los viajes realizados con dBizi en San Sebastian durante el 6 de junio de 2018. Empleando únicamente la información del número de bicicletas en cada estación, es posible estimar los viajes realizados por medio de un modelo de optimización lineal.</p>
+							<div class="folium-map" id="map_id" style="height:600px" ></div>
+							<!--<iframe src="https://api.mapbox.com/styles/v1/inigoml/cjiz1f25w073f2rpdr8jhp0e3.html?fresh=true&title=true&access_token=pk.eyJ1IjoiaW5pZ29tbCIsImEiOiJjamcycndxcDAwcmlsMnFwaHk4eDdpanhnIn0.lOge1jvtZgNLhr6yUdz8qA#13.6/43.315232/-1.982455/0" style = "width:100%; height:400px"></iframe>-->
+						<ul class="actions" style="padding-top:20px;width: 40%;margin: auto;">
+							<li><a  target="_blank" href="generic.html" class="button">Cómo lo hemos realizado?</a></li>
+						</ul>
+						</div>
+					</section>
+				 
+					<section id="design" class="wrapper style2 fullscreen fade-up">
+						<div class="inner">
+							<h2>Diseño Prototipo App </h2>
+							<!-- Slideshow container -->
+							<div class="slideshow-container_xtr center" style="width:30%">
+
+							  <!-- Full-width images with number and caption text -->
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_1.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_2.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_11.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_3.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_4.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_5.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_7.png" style="width:100%"></div>
+							  <div class="mySlides_xtr fade_xtr"><img src="images/iphone_9.png" style="width:100%"></div>
+							  
+							  <!-- Next and previous buttons -->
+							  <a class="prev_xtr" onclick="plusSlides(-1)">&#10094;</a>
+							  <a class="next_xtr" onclick="plusSlides(1)">&#10095;</a>
+							</div>
+							<br>
+
+							<!-- The dots/circles -->
+							<div style="text-align:center">
+							  <span class="dot_xtr" onclick="currentSlide(1)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(2)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(3)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(4)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(5)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(6)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(7)"></span>
+							  <span class="dot_xtr" onclick="currentSlide(8)"></span>
+							</div> 
+						</div> 
+					</section>
+				
+				
+				
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper style3 style1-alt">
+				<div class="inner">
+					<ul class="menu">
+						<!--<li>&copy; dBizi++. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>-->
+						<li><h3>dBizi++. Proyecto ideado por <u><a href="https://www.linkedin.com/in/imartinezl/">Iñigo Martinez<u> </h3></a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+	</body>
+	<script src="assets/js/map.js"></script>
+	<script>
+	var slideIndex = 1;
+	showSlides(slideIndex);
+
+	// Next/previous controls
+	function plusSlides(n) {
+	  showSlides(slideIndex += n);
+	}
+
+	// Thumbnail image controls
+	function currentSlide(n) {
+	  showSlides(slideIndex = n);
+	}
+
+	function showSlides(n) {
+	  var i;
+	  var slides = document.getElementsByClassName("mySlides_xtr");
+	  var dots = document.getElementsByClassName("dot_xtr");
+	  if (n > slides.length) {slideIndex = 1}
+	  if (n < 1) {slideIndex = slides.length}
+	  for (i = 0; i < slides.length; i++) {
+		  slides[i].style.display = "none";
+	  }
+	  for (i = 0; i < dots.length; i++) {
+		  dots[i].className = dots[i].className.replace(" active_xtr", "");
+	  }
+	  slides[slideIndex-1].style.display = "block";
+	  dots[slideIndex-1].className += " active_xtr";
+	} 
+	//var myVar = setInterval(function(){
+	//	plusSlides(1)
+	//	}, 3000); 
+	</script>
+</html>

@@ -19,7 +19,7 @@ matplotlib.rcParams['timezone'] = 'Europe/Madrid'
 #%% CONNECTION WITH RASPBERRY DB
 
 conn_string = "host='localhost' dbname='dBici' user='postgres' password='root'"
-conn_string = "host='192.168.1.252' dbname='dBici' user='postgres' password='root'"
+conn_string = "host='192.168.1.205' dbname='dBici' user='postgres' password='root'"
 
 def get_data(conn_string):
     conn = psycopg2.connect(conn_string)
@@ -31,15 +31,36 @@ def get_data(conn_string):
     return records
 
 #%% OBTAIN DATA FROM DB
-    
-data = get_data(conn_string)
+from_server = False
 
 df = pd.DataFrame()
-for i in range(95,len(data)):
-    unixtime = data[i][1]
-    df_temp = pd.read_json(json.dumps(data[i][2]))
-    df_temp['unixtime'] = unixtime
-    df = pd.concat([df,df_temp])
+
+if from_server:
+    data = get_data(conn_string)
+    for i in range(0,len(data)):
+        unixtime = data[i][1]
+        df_temp = pd.read_json(json.dumps(data[i][2]))
+        df_temp['unixtime'] = unixtime
+        df = pd.concat([df,df_temp])
+else:
+    import csv
+    reader = csv.reader(open('pg_database.csv'), delimiter='|',quotechar='"')
+    i = 0; 
+    for row in reader:
+        if i==0:
+            header = row
+        else:
+            comma_1 = row[-1].find(',')
+            comma_2 = row[-1][(comma_1+1):].find(',')
+            unixtime = row[-1][comma_1+1:comma_1+comma_2]
+            json_ = row[-1][(comma_1+comma_2+2):]
+
+            df_temp = pd.read_json(json_.replace('"','').replace('\'','"'))
+            df_temp['unixtime'] = unixtime
+            df = pd.concat([df,df_temp])
+        i += 1
+        
+
     
 df['date'] = pd.to_datetime(df['unixtime'], unit='s').dt.tz_localize('UTC').dt.tz_convert('Europe/Madrid')
 df['day'] = [x.day for x in df['date']]
@@ -47,7 +68,11 @@ df['hour'] = [x.hour for x in df['date']]
 
 df['bases_eng_lib'] = df['bases_enganchadas'] + df['bases_libres']
 df['bases_bloq'] = df['numero_bases'] - df['bases_eng_lib']
+df['bases_enganchadas_sht'] = df.groupby(['nombre'])['bases_enganchadas'].transform(lambda x:(x - x.shift(1)))
+df['bases_libres_sht'] = df.groupby(['nombre'])['bases_libres'].transform(lambda x:(x - x.shift(1)))
+df['bases_bloq_sht'] = df.groupby(['nombre'])['bases_bloq'].transform(lambda x:(x - x.shift(1)))
 df['to_road'] = df.groupby(['nombre'])['bases_enganchadas'].transform(lambda x:-(x - x.shift(1)))
+df['to_road'] = df.groupby(['nombre'])['bases_libres'].transform(lambda x:(x - x.shift(1)))
 
 df.index = range(df.shape[0])
 #%% FIRST PLOT
@@ -110,7 +135,8 @@ data_station['to_road'] = -data_station['bases_enganchadas_sht']
 
 #%%
 # GET SUBSET
-df_subset = df[df['day']==5]
+df.groupby('day').apply(sum)
+df_subset = df[(df['day']==15) & (df['hour']>6)] #5
 
 #per_ts = df_subset.groupby('date')['to_road'].apply(sum)
 #found = 0
@@ -161,15 +187,15 @@ ts_end = 0
 s = np.zeros(per_ts.shape[0])
 for i in range(ts_start+1, per_ts.shape[0]):
     s[i] = s[i-1] + per_ts.iloc[i-1]
-    if s[i]<0:
+    if s[i] < 0:
         ts_end=i
-        break
+        #break
     
 df_study = df_subset[(df_subset['date'] >= per_ts.index[ts_start]) & (df_subset['date'] < per_ts.index[ts_end])]
 condition_start = df_study.groupby('date')['to_road'].apply(lambda x: any(x<0)) #should be false at start
 condition_end = df_study.groupby('date')['to_road'].apply(lambda x: any(x>0)) #should be false at end
     
-# HACKING OF CONDITIONS
+#%% HACKING OF CONDITIONS
 df_study['to_road'].loc[[4672,4681,4685]] = 0
 df_study['to_road'].loc[4677] = -5
 #%%
@@ -222,6 +248,9 @@ b = np.int8(b)
 
 ss = np.sum(A,axis=1)
 #%%
+#import scipy.io
+#scipy.io.savemat('test.mat', dict(A=A, b=b, c=c))
+
 np.savetxt("c.csv", c, delimiter=",", fmt='%.2f', newline='\n', encoding=None)
 np.savetxt("b.csv", b, delimiter=",", fmt='%d', newline='\n', encoding=None)
 np.savetxt("A.csv", A, delimiter=",", fmt='%d', newline='\n', encoding=None)

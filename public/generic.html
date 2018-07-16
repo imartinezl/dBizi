@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>dBizi++</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">dBizi++</a>
+				<!--<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+						<li><a href="generic.html" class="active">Generic</a></li>
+						
+					</ul>
+				</nav>-->
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<h1 class="major">Metodología del Proyecto</h1>
+							<h2>1. Fuente Datos</h2>
+							<p>Los datos de este proyecto se han extraído del servicio de <a href="http://www.donostia.eus/ataria/es/web/donostia-data/hasiera">Datos Abiertos del Ayuntamiento de San Sebastián</a>. En concreto, se ha obtenido la <a href="https://www.donostia.eus/datosabiertos/catalogo/carriles-bici">red de carriles bici</a> (.kml), los <a href="https://www.donostia.eus/datosabiertos/catalogo/aparcamientos-publicos-bicicletas">aparcamientos públicos de bicicletas</a> de la ciudad (kml), y la <a href="http://www.donostia.eus/ataria/es/web/donostia-data/dbizi-geltokiko-bizikleta-libreak">disponibilidad de bicicletas</a> en tiempo real (.json)</p>
+							<p>Los usuarios de dBizi pagan en función del uso que hacen del servicio. Obviamente, el sistema informático de dBizi registra en algún punto los tiempos de salida y llegada de cada usuario (desconozco si las estaciones también se registran). Sin embargo, esta información personal de cada usuario es inaccesible para el público. Cabe destacar que en este proyecto se ha realizado una estimación de los viajes realizados empleando únicamente el número de bases disponibles en cada estación, y no datos personales de los usuarios.</p>
+							<h2>2. Adquisición Datos</h2>
+							<p>A pesar de contar con la disponibilidad de bicicletas en tiempo real, el servicio de datos abiertos no ofrece la posibilidad de acceder a datos históricos. Es por ello que, con el objetivo de estudiar la viabilidad de este proyecto, se ha desarrollado una simple plataforma de adquisición de datos en una <a href="https://www.raspberrypi.org/products/raspberry-pi-1-model-b-plus/">Raspberry Pi</a>. Este plataforma comprueba, con una frecuencia minutal, si los datos a tiempo real han sufrido algún cambio, en cuyo caso, dicha información se almacena en una base de datos <a href="https://www.postgresql.org/">PostgreSQL</a> con formato JSON. Con esta plataforma se han almacenado datos durante dos semanas de Junio de 2018.</p>
+							<h2>3. Análisis Datos</h2>
+							<p>Tras la obtención de datos, se ha realizado un análisis exploratorio y de limpieza en Python. Por un lado, se han extraído las variables más interesantes para este estudio: longitud y latitud de las estaciones, y disponibilidad de bases libres (u ocupación de bases enganchadas). En este sentido, se ha visto que la suma de bases libres y bases enganchadas no se mantiene constante al número de bases totales en cada estación. A pesar de que pueda haber un retraso en la actualización de los datos, no se han visto un patrón aclaratorio.</p>
+														
+							<span class="image fit">
+								<img src="images/tech_png2.png" alt="" style="display: block;margin-left: auto;margin-right: auto;width: 50%;"/>
+							</span>
+							<h2>4. Algoritmo Estimación Rutas</h2>
+							<p>Los datos de los que parte este algoritmo son: En un tiempo t, se ha registrado un cambio en el número de bases disponibles k de una estación s. Si dicho cambio es positivo, se considera que aumenta el nímero de bases libres.Con dichos datos, y considerando que un usuario no volverá a la misma estación de la que partió, se construye el conjunto de todos los viajes posibles.</p>
+							<p>Considerando un tiempo acotado (servicio diario de dBizi de 06:30 a 23:00 horas), se ha resuelto el problema de optimización lineal entera por medio de <a href="https://www.ibm.com/es-es/marketplace/ibm-ilog-cplex">IBM ILOG CPLEX</a></p>
+							<p>A cada viaje se le asigna un 1 si se realiza y un 0 en caso contrario. El coste de un viaje se calcula como la diferencia entre la duración estimada de un viaje en bicicleta entre las estaciones seleccionadas. Esta duración se ha estimado con la API de <a href="https://graphhopper.com/api/1/docs/">GraphHopper</a>.</p>
+							
+							<h2>5. Visualización</h2>
+							<p>Para la visualización se ha empleado la librería <a href="https://leafletjs.com/">Leaflet.js</a>, que mediante un módulo de visualización temporal (<a href="https://github.com/socib/Leaflet.TimeDimension">TimeDimension</a>), ha permitido incluir los viajes de cada bicicleta sobre el mapa de San Sebastián. Por otro lado, las gráficas de frecuencias y estadísticas del análisis exploratorio se han obtenido por medio de <a href="https://matplotlib.org/">Matplotlib</a> de Python.</p>
+							
+							<h2>6. Aplicación Web</h2>
+							<p>Por último, la <a href="http://dbizi-project.firebaseapp.com/">aplicación web</a> se ha desarrollado mediante el servicio <a href="https://firebase.google.com/">Firebase de Google</a>. Actualmente la web solo ilustra el proyecto y el concepto de la aplicación.</p>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li><h3>dBizi++. Proyecto ideado por <u><a href="https://www.linkedin.com/in/imartinezl/">Iñigo Martinez<u> </h3></a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
