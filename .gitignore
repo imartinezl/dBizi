@@ -3,3 +3,92 @@ src/env/
 data/
 graph.html
 *.csv
+
+ <img src="public/images/logo_blue.png" width="500">
+
+1 Introduction
+=================
+
+[dBizi](https://www.dbizi.com/) is the **public electric bicycle loan service** in the city of San Sebastian, Spain.
+
+Currently, dBizi users can know in real time, with a frequency of 5-6 minutes, the availability of bicycles in the 16 stations of the city. This information does not guarantee the user to have bicycles in their departure station, given the influx of users at certain times. In the same way, it is possible that the user finds himself without available bases in which to park his bicycle.
+
+[dBizi++](https://dbizi-project.firebaseapp.com/) is presented as an **application for consultation and planning of bicycle trips** with dBizi. This service uses available bicycle data in order to guarantee the availability of the service at all times, and for all users. The application informs the user of the viability of their journey, using historical data and in real time.
+
+The project is intended for dBizi users as well as for the maintenance of the bicycle system. This extension of the dBizi service allows users to estimate if they will have bicycles when they arrive at their departure station and if, given a destination station, they will have free bases to park their bicycles.
+
+Likewise, the information entered by the user in the application will allow the maintainer to know in advance the possible trips of the users and plan actions to guarantee the availability of bicycles and free bases.
+
+2 Project Goals
+===========
+
+- **For users**: Improve the availability of the dBizi service
+
+- **For the maintainer** of the system: Know the most used stations, the most common routes between users and periods of greatest use of the service.
+
+3 Advantages
+==========
+
+- Check the feasibility of a trip in real time.
+
+- Possibility of reserving, at low cost, a specific route: source station, destination station, and estimated time.
+
+- Visualization of the journeys made by bicycle in the city, illustrating the most used bicycle lanes with heat maps.
+
+4 Methodology
+==========================
+
+4.1 Data Sources
+----------------
+The data of this project has been extracted from the service of [Open Data of San Sebastián City Council] (http://www.donostia.eus/ataria/es/web/donostia-data/hasiera). Specifically, we have obtained the [network of bike lanes] (https://www.donostia.eus/datosabiertos/catalogo/carriles-bici) (.kml), the [public bicycle parking] (https: // www .donostia.eus / open data / catalog / car parks-public-bicycles) of the city (kml), and the [availability of bicycles] (http://www.donostia.eus/ataria/es/web/donostia-data/ dbizi-geltokiko-bizikleta-libreak) in real time (.json)
+
+ <img src="public/images/table.png" width="300">
+
+DBizi users pay based on their use of the service. Obviously, the dBizi computer system records at some point the departure and arrival times of each user (I do not know if the stations are also registered). However, this personal information of each user is inaccessible to the public. It should be noted that this project has estimated the trips made using only the number of bases available in each station, and not personal data of users.
+
+4.2 Adquisición Datos
+---------------------
+
+A pesar de contar con la disponibilidad de bicicletas en tiempo real, el servicio de datos abiertos no ofrece la posibilidad de acceder a datos históricos. Es por ello que, con el objetivo de estudiar la viabilidad de este proyecto, se ha desarrollado una simple plataforma de adquisición de datos en una [Raspberry Pi](https://www.raspberrypi.org/products/raspberry-pi-1-model-b-plus/). Este plataforma comprueba, con una frecuencia minutal, si los datos a tiempo real han sufrido algún cambio, en cuyo caso, dicha información se almacena en una base de datos [PostgreSQL](https://www.postgresql.org/) con formato JSON. Con esta plataforma se han almacenado datos durante dos semanas de Junio de 2018.
+
+4.3 Análisis Datos
+------------------
+
+Tras la obtención de datos, se ha realizado un análisis exploratorio y de limpieza en Python. Por un lado, se han extraído las variables más interesantes para este estudio: longitud y latitud de las estaciones, y disponibilidad de bases libres (u ocupación de bases enganchadas). En este sentido, se ha visto que la suma de bases libres y bases enganchadas no se mantiene constante al número de bases totales en cada estación. A pesar de que pueda haber un retraso en la actualización de los datos, no se han visto un patrón aclaratorio.
+
+4.4 Algoritmo Estimación Rutas
+------------------------------
+
+Los datos de los que parte este algoritmo son: En un tiempo ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image006.png), se ha registrado un cambio en el número de bases disponibles ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image008.png)de una estación ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image010.png). Si dicho cambio es positivo, se considera que aumenta el número de bases libres.
+
+Con dichos datos, y considerando que un usuario no volverá a la misma estación de la que partió, se construye el conjunto de todos los viajes posibles ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image012.png):
+
+![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image014.png)
+
+siendo ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image016.png)las estaciones origen y destino, y ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image018.png)los tiempos de salida y llegada. Con ello, considerando un tiempo acotado (servicio diario de dBizi de **06:30 a 23:00 horas), se ha resuelto el siguiente problema de optimización lineal entera por medio de **[IBM ILOG CPLEX](https://www.ibm.com/es-es/marketplace/ibm-ilog-cplex)**:**
+
+![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image020.png)
+
+**A cada viaje **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image022.png)**se le asigna un 1 si se realiza y un 0 en caso contrario. El coste de un viaje **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image024.png)**se calcula como la diferencia entre la duración estimada de un viaje en bicicleta entre las estaciones **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image026.png)y ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image028.png)y el tiempo ![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image030.png). Esta duración se ha estimado con la API de [GraphHopper](https://graphhopper.com/api/1/docs/).
+
+La minimización está sujeta a:
+
+![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image032.png)
+
+**Siendo **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image034.png)**cualquier viaje que comience en **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image010.png)**, en un tiempo **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image006.png)**, y finalice en cualquier otra estación que no sea **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image010.png)**, en un tiempo posterior a **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image006.png)**.**
+
+![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image036.png)
+
+**Siendo **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image034.png)**cualquier viaje que finalice en **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image010.png)**, en un tiempo **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image006.png)**, y haya comenzado en cualquier otra estación que no sea **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image010.png)**, en un tiempo anterior a **![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image006.png)**.**
+
+4.5 Visualización
+-----------------
+
+Para la visualización se ha empleado la librería [Leaflet.js](https://leafletjs.com/), que mediante un módulo de visualización temporal ([TimeDimension](https://github.com/socib/Leaflet.TimeDimension)), ha permitido incluir los viajes de cada bicicleta sobre el mapa de San Sebastián. Por otro lado, las gráficas de frecuencias y estadísticas del análisis exploratorio se han obtenido por medio de [Matplotlib](https://matplotlib.org/) de Python.
+
+4.6 Aplicación Web
+------------------
+
+Por último, la [aplicación web](http://dbizi-project.firebaseapp.com/) se ha desarrollado mediante el servicio [Firebase de Google](https://firebase.google.com/). Actualmente la web solo ilustra el proyecto y el concepto de la aplicación.
+
+![](file:///C:/Users/Inigo/AppData/Local/Temp/msohtmlclip1/01/clip_image038.jpg)
