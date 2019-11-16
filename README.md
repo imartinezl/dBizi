@@ -76,10 +76,10 @@ Where  *x<sub>j</sub>* is any trip that ends in *s*, in a time *t* and starts in
 DataViz
 -----------------
 
-For the visualization, the [Leaflet.js library](https://leafletjs.com/) has been used, using a temporary visualization module ([TimeDimension](https://github.com/socib/Leaflet.TimeDimension) ), has allowed to include the trips of each bicycle on the map of San Sebastian. On the other hand, the frequency graphs and statistics of the exploratory analysis have been obtained by means of [Matplotlib](https://matplotlib.org/) of Python.
+For the visualization, the [Leaflet.js library](https://leafletjs.com/) has been used, using a temporary visualization module ([TimeDimension](https://github.com/socib/Leaflet.TimeDimension)), has allowed to include the trips of each bicycle on the map of San Sebastian. On the other hand, the frequency graphs and statistics of the exploratory analysis have been obtained by means of [Matplotlib](https://matplotlib.org/) of Python.
 
 Web App
 ------------------
 
-Finally, the [web application] (http://dbizi-project.firebaseapp.com/) has been developed using the service [Google Firebase] (https://firebase.google.com/). Currently the web only illustrates the project and the concept of the application.
+Finally, the [web application](http://dbizi-project.firebaseapp.com/) has been developed using the service [Google Firebase](https://firebase.google.com/). Currently the web only illustrates the project and the concept of the application.
 
