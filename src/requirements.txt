@@ -29,5 +29,5 @@ query-string==1.0.2
 request==1.0.2
 requests==2.32.4
 six==1.11.0
-urllib3==2.5.0
+urllib3==2.6.0
 zope.interface==4.5.0
